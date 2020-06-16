@@ -4,15 +4,15 @@ const socket = io("http://localhost:3000", { username: "Aleksej" });
 // , {
 //   transports: ["websocket"],
 // });
-const messageContainer = document.getElementById("message-container");
-const messageForm = document.getElementById("send-container");
+const selectContainer = document.getElementById("select-container");
+const messageForm = document.getElementById("send-button");
 const messageInput = document.getElementById("message-input");
 
 console.log("Socket.io", socket.io);
 
 socket.on("connect", () => {
   console.log("socket connected");
-  const name = "Dora";
+  const name = "Web-Dev";
   socket.emit("new-user", name);
 });
 
@@ -32,14 +32,15 @@ socket.on("send-message", (data) => {
   console.log(data);
 });
 
-messageForm.addEventListener("submit", (e) => {
+messageForm.addEventListener("click", (e) => {
+  console.log("send button clicked");
   e.preventDefault();
   const message = messageInput.value;
-  addMessage(`You: ${message}`);
   // socket.emit("send-message", { body: message });
   let body = {
-    msg: "Accept tyres ",
-    toUser: "EDA-EMUL",
+    message: message,
+    to: "EDA-EMUL",
+    from: "Web-Dev",
   };
   fetch("http://127.0.0.1:3002/message", {
     method: "POST",
@@ -58,4 +59,10 @@ function addMessage(message) {
   const messageElement = document.createElement("div");
   messageElement.innerText = message;
   messageContainer.append(messageElement);
+}
+
+function createDropDown() {
+  const optionElement = document.createElement("option");
+  optionElement.value = addressee;
+  selectContainer.append(optionElement);
 }

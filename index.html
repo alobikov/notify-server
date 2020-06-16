@@ -6,13 +6,15 @@
     <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <title>Chat SocketIo</title>
     <script defer src="http://localhost:3000/socket.io/socket.io.js"></script>
     <script defer src="script.js"></script>
     <style>
         .parent {
             height: 800px;
+            width: 500px;
             display: flex;
         }
 
@@ -25,15 +27,49 @@
 </head>
 
 <body>
-    <div class="container parent">
-        <div id="message-container"></div>
-        <div class="child">
-            <form id="send-container">
-                <input id="message-input" type="text">
-                <button type="submit" id="send-button" class="btn">Send</button>
-            </form>
+
+    <div class="container">
+        <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+            <h1>Notify testing page</h1>
+            <br />
+            <small>use wisely</small>
+        </nav>
+
+
+
+        <div>
+            <a class="my-4 btn btn-primary btn" target="_blank" href="http://127.0.0.1:3002/users/" role="button">List
+                all
+                users</a>
         </div>
+        <div>
+            <a class="mb-4 btn btn-primary btn" target="_blank" href="http://127.0.0.1:3002/messages" role="button">List
+                all
+                messages</a>
+        </div>
+
+
+        <form>
+            <div class="form-row">
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <button class="mx-1 btn btn-primary btn" type="button" id="send-button">Send</button>
+                        <select class="custom-select mr-sm-2" id="select-container">
+                            <option selected>Message to...</option>
+                            <option value="1">Dora</option>
+                            <option value="2">Viktor Kondratchik</option>
+                            <option value="3">Aleksej</option>
+                        </select>
+                    </div>
+                    <input type="text" class="form-control" id="message-input">
+                </div>
+
+            </div>
+        </form>
     </div>
+
+
 
 </body>
 

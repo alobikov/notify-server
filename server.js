@@ -29,6 +29,11 @@ const app = express();
 const expressPort = 3002;
 const wsPort = 3000;
 const mongodbUrl = "mongodb://127.0.0.1:27017/notify";
+
+// this is storage for socketio subscribed user
+// it is being hold only in RAM as user dynamiclly
+// reconnects to socketio;
+// holds {socket.id : user} pairs
 var users = {};
 
 async function start() {
@@ -64,29 +69,44 @@ function runExpress() {
   //**************************** API GET MESSAGES ******************************/
   app.get("/messages", async function (req, res) {
     console.log('GET on "/messages" recieved');
-    res.send(`<pre> ${JSON.stringify(await getAllMessages(), null, 2)} </pre>`);
+    res.json(await getAllMessages());
   });
-
+  //**************************** API GET USERS *********************************/
+  app.get("/users", function (req, res) {
+    console.log('GET on "/users" received');
+    const usersJson = Object.keys(users).map((key) => {
+      return { socketId: key, deviceId: users[key] };
+    });
+    res.json(usersJson);
+  });
+  //**************************** API GET USERS AND ID **************************/
+  app.get("/users_id", function (req, res) {
+    console.log('GET on "/users_id" received');
+    // alternative way to send json from express
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify({ users }));
+  });
   //**************************** API POST MESSAGE ******************************/
   // This service used by CRM and webclient to send target message to
   // mobile terminal
   app.post("/message", (req, res) => {
+    console.log('POST to "/messages" received');
     res.send({ response: "Message received" });
 
-    const { msg, toUser, from } = req.body;
+    const { message, to, from } = req.body;
     const timestamp = Date.now();
 
     console.log(
-      msg.trim() +
+      message.trim() +
         " | sent to " +
-        toUser +
+        to +
         " | on " +
         Date(timestamp).toString().slice(0, 24)
     );
     // save message in mongo
     const msgToDb = new Message({
-      message: msg,
-      to: toUser,
+      message: message,
+      to: to,
       confirmed: false,
       from: from && "CRM",
       timestamp: Date.now(),
@@ -97,15 +117,15 @@ function runExpress() {
     // emit message if addresse exists
     const targetSocket = Object.keys(users).filter((key) => {
       console.log(users[key]);
-      return users[key] === toUser;
+      return users[key] === to;
     })[0];
-    console.log(targetSocket);
+    console.log({ targetSocket });
     if (targetSocket) {
       console.log("emitting personally");
       io.to(targetSocket).emit("message", {
         message: msg,
         timestamp: timestamp,
-        to: toUser,
+        to: to,
         from: "CRM",
       });
     }
