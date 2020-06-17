@@ -8,8 +8,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
         integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <title>Chat SocketIo</title>
+    <title>Notify Test</title>
     <script defer src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script defer src="./config/constants.js"></script>
     <script defer src="script.js"></script>
     <style>
         .parent {
@@ -34,9 +35,12 @@
             <br />
             <small>use wisely</small>
         </nav>
-
-
-
+        <div class="input-group mt-4">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Username</span>
+            </div>
+            <input disabled type="text" class="form-control" id="username-container">
+        </div>
         <div>
             <a class="my-4 btn btn-primary btn" target="_blank" href="http://127.0.0.1:3002/users/" role="button">List
                 all
@@ -47,8 +51,6 @@
                 all
                 messages</a>
         </div>
-
-
         <form>
             <div class="form-row">
 
@@ -57,12 +59,16 @@
                         <button class="mx-1 btn btn-primary btn" type="button" id="send-button">Send</button>
                         <select class="custom-select mr-sm-2" id="select-container">
                             <option selected>Message to...</option>
-                            <option value="1">Dora</option>
-                            <option value="2">Viktor Kondratchik</option>
-                            <option value="3">Aleksej</option>
+                            <option value="Victor Kondratchik">Viktor Kondratchik</option>
                         </select>
                     </div>
                     <input type="text" class="form-control" id="message-input">
+                </div>
+                <div class="container">
+                    <div class="col mb-3" id="error-message" style="color: red"></div>
+                    <ul style="list-style-type:none" class="list-group" id="message-container">
+
+                    </ul>
                 </div>
 
             </div>

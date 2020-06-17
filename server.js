@@ -26,8 +26,8 @@ const mongoose = require("mongoose");
 const chalk = require("chalk");
 const express = require("express");
 const app = express();
-const expressPort = 3002;
-const wsPort = 3000;
+const portExpress = 3002;
+const portWs = 3000;
 const mongodbUrl = "mongodb://127.0.0.1:27017/notify";
 
 // this is storage for socketio subscribed user
@@ -35,6 +35,8 @@ const mongodbUrl = "mongodb://127.0.0.1:27017/notify";
 // reconnects to socketio;
 // holds {socket.id : user} pairs
 var users = {};
+
+const webUserNames = ["Web-Dev4", "Web-Dev3", "Web-Dev2", "Web-Dev1"];
 
 async function start() {
   try {
@@ -116,27 +118,27 @@ function runExpress() {
     // check presence of addressee in users
     // emit message if addresse exists
     const targetSocket = Object.keys(users).filter((key) => {
-      console.log(users[key]);
+      console.log(users[key], to);
       return users[key] === to;
     })[0];
     console.log({ targetSocket });
     if (targetSocket) {
       console.log("emitting personally");
       io.to(targetSocket).emit("message", {
-        message: msg,
+        message: message,
         timestamp: timestamp,
         to: to,
-        from: "CRM",
+        from: from,
       });
     }
   });
 
-  app.listen(expressPort, () =>
-    console.log(chalk.yellow("Expess listening on port ", expressPort))
+  app.listen(portExpress, () =>
+    console.log(chalk.yellow("Expess listening on port ", portExpress))
   );
 }
 
-const io = require("socket.io")(wsPort);
+const io = require("socket.io")(portWs);
 //      , {
 //   transports: ["websocket"],
 // });
@@ -147,7 +149,12 @@ const io = require("socket.io")(wsPort);
 // 'message' to users
 // This is supplementary service which allows mobile users to send messages
 io.on("connection", (socket) => {
-  console.log("new user", socket.id, new Date());
+  console.log("New user connected", socket.id, new Date());
+  /// advice username to connected client
+  const name = webUserNames.pop() || "Web-Dev";
+  socket.emit("your-name", name);
+  users[socket.id] = name; // save value pair in users
+
   socket.on("send-message", (data) => {
     console.log(data);
     socket.broadcast.emit("message", {
@@ -159,11 +166,14 @@ io.on("connection", (socket) => {
 
   socket.on("new-user", (name) => {
     users[socket.id] = name; // save value pair in users
-    console.log(chalk.red("New user registred %s"), users);
+    console.log(chalk.yellow("New user registred %s"), users);
   });
   socket.on("disconnect", () => {
-    socket.broadcast.emit("user-disconnected", users[socket.id]);
-    delete users[socket.id];
+    const name = users[socket.id];
+    // socket.broadcast.emit("user-disconnected", users[socket.id]);
+    console.log(chalk.red(`${name} socket disconnected!`));
+    delete users[socket.id]; // clean up local storage
+    webUserNames.push(name); // return name to the pool
   });
 });
 
